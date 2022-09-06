@@ -14,7 +14,7 @@ import { NotFoundError } from '../errors/not-found-error';
 
 
 const app = express();
-app.settings('trust proxy', true);
+app.enable('trust proxy');
 app.use(json())
 app.use(cookieSession({
     signed: false,
@@ -28,12 +28,16 @@ app.use(signoutRouter)
 app.use(signupRouter)
 
 app.all("*", async(req,res,next) => {
+    console.log("HERE")
     throw new NotFoundError()
 })
 
 app.use(errorHandler);
 
 const start = async () => {
+    if(!process.env.JWT_KEY){
+        throw new Error("JWT_KEY is not defined")
+    }
     try {
     
     await mongoose.connect('mongodb://auth-mongo-srv:27017/auth');
