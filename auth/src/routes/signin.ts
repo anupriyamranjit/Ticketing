@@ -1,10 +1,9 @@
 import express, {Request, Response} from 'express';
-import { BadRequestError } from '../../errors/bad-request-error';
+import { BadRequestError , validateRequest } from '@aranjit_ticketing/common';
 import { User } from '../../models/user';
 import { Password } from "../../services/password"
 import jwt from 'jsonwebtoken';
 import { body } from 'express-validator';
-import { validateRequest } from '../../middlewares/validate-request';
 const router = express.Router();
 
 router.post('/api/users/signin', [
