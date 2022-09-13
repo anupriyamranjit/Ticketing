@@ -7,7 +7,7 @@ import { Ticket } from '../../models/ticket';
 import { natsWrapper } from '../nats-wrapper';
 
 
-const EXPIRATION_WINDOW_SECONDS = 15 * 60;
+const EXPIRATION_WINDOW_SECONDS = 1 * 60;
 
 const router = express.Router();
 
@@ -19,7 +19,8 @@ router.post('/api/orders',requireAuth, [
 ], validateRequest,
 async (req: Request, res: Response) => {
     // Find the ticket the user is trying to order
-    const ticket = await Ticket.findOne(req.body.ticketId)
+    const ticket = await Ticket.findOne({_id: req.body.ticketId})
+    console.log(ticket, req.body.ticketId);
 
     if(!ticket){
         throw new NotFoundError();
@@ -48,6 +49,7 @@ async (req: Request, res: Response) => {
     new OrderCreatedPublisher(natsWrapper.client).publish({
         id: order.id,
         status: order.status,
+        version: order.version,
         userId: order.userId,
         expiresAt: order.expiresAt.toISOString(),
         ticket: {

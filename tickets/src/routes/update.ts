@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { NotAuthorizedError, NotFoundError, requireAuth, validateRequest } from "@aranjit_ticketing/common"
+import { BadRequestError, NotAuthorizedError, NotFoundError, requireAuth, validateRequest } from "@aranjit_ticketing/common"
 
 import { body } from 'express-validator'
 import { Ticket } from '../models/ticket';
@@ -23,6 +23,10 @@ router.put("/api/tickets/:id", requireAuth, [
         throw new NotFoundError();
     }
 
+    if(ticket.orderId){
+        throw new BadRequestError("Cannot edit a reserved ticket");
+    }
+
     if(ticket.userId !== req.currentUser!.id){
         throw new NotAuthorizedError
     }
@@ -36,8 +40,9 @@ router.put("/api/tickets/:id", requireAuth, [
         id: ticket.id,
         title: ticket.title,
         price: ticket.price,
-        userId: ticket.userId
-    });;
+        userId: ticket.userId,
+        version:ticket.version
+    });
     
 
 

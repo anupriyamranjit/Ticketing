@@ -13,14 +13,15 @@ import {
     queueGroupName = queueGroupName;
   
     async onMessage(data: TicketUpdatedEvent["data"], msg: Message) {
-      const ticket = await Ticket.findById(data.id);
-
+      const ticket = await Ticket.findOne({id: data.id, version: data.version});
       if(!ticket){
         throw new Error("Ticket not found")
       }
       const {title, price} = data;
       ticket.set({ title, price });
       await ticket.save()
+
+      console.log("Ticket Updated with id:", ticket.id)
 
       msg.ack()
     }
